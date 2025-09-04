@@ -1,0 +1,44 @@
+{
+  "components": [
+    {
+      "name": "Button",
+      "path": "components/ui/button.tsx",
+      "description": "A reusable button component for the application."
+    },
+    {
+      "name": "Input",
+      "path": "components/ui/input.tsx",
+      "description": "A reusable input component for form fields."
+    },
+    {
+      "name": "Card",
+      "path": "components/ui/card.tsx",
+      "description": "A component for displaying content in a card format."
+    },
+    {
+      "name": "Form",
+      "path": "components/ui/form.tsx",
+      "description": "A component for handling form submissions."
+    },
+    {
+      "name": "BookCard",
+      "path": "components/book-card.tsx",
+      "description": "A component for displaying book information."
+    },
+    {
+      "name": "BookForm",
+      "path": "components/book-form.tsx",
+      "description": "A form component for creating or editing book details."
+    },
+    {
+      "name": "AuthorForm",
+      "path": "components/author-form.tsx",
+      "description": "A form component for creating or editing author details."
+    },
+    {
+      "name": "Navigation",
+      "path": "components/navigation.tsx",
+      "description": "A component for site navigation."
+    }
+  ]
+}
