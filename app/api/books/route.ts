@@ -1,47 +1,41 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { NextResponse } from 'next/server'; // NextResponse từ next.js để tạo http response (JSON, status code)
+import { prisma } from '@/app/server/db/client';
 
 // GET /api/books
 export async function GET() {
-    const books = await prisma.book.findMany();
-    return NextResponse.json(books);
+    try {
+        const books = await prisma.book.findMany({
+            include: { author: true, user: true },
+            orderBy: { createdAt: "desc" },
+        });
+        return NextResponse.json(books);
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json({ error: 'Failed to fetch books' }, { status: 500 });
+    }
 }
 
-// POST /api/books
-export async function POST(request: Request) {
-    const { title, authorId, pages, description } = await request.json();
+// POST dùng để tạo sách mơi
+export async function POST(req: Request) {
+    try {
+        // tạo sách mới từ dữ liệu JSON trong body request
+        const body = await req.json();
+        const { title, authorId, pages, userId } = body;
+        // check authorId và title có exist không?
+        if (!authorId || !title) {
+            return NextResponse.json({ error: 'Author ID and title are required' }, { status: 400 });
+        }
     const newBook = await prisma.book.create({
         data: {
             title,
             authorId,
             pages,
-            description,
+            userId,
         },
     });
     return NextResponse.json(newBook, { status: 201 });
-}
-
-// PUT /api/books/:id
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-    const { id } = params;
-    const { title, authorId, pages, description } = await request.json();
-    const updatedBook = await prisma.book.update({
-        where: { id: Number(id) },
-        data: {
-            title,
-            authorId,
-            pages,
-            description,
-        },
-    });
-    return NextResponse.json(updatedBook);
-}
-
-// DELETE /api/books/:id
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-    const { id } = params;
-    await prisma.book.delete({
-        where: { id: Number(id) },
-    });
-    return NextResponse.json({ message: 'Book deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json({ error: 'Failed to create book' }, { status: 500 });
+    }
 }

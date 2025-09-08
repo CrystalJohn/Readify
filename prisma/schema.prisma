@@ -19,18 +19,28 @@ model User {
 }
 
 model Book {
-  id          Int      @id @default(autoincrement())
-  title       String
-  authorId    Int
-  author      Author   @relation(fields: [authorId], references: [id])
-  progress    Float    @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  title     String
+  pages     Int?
+  progress  Float    @default(0)
+  
+  // Relations
+  authorId  Int
+  author    Author   @relation(fields: [authorId], references: [id], onDelete: Cascade) //onDelete ở đây là nếu tác giả bị xóa, sách cũng sẽ bị xóa
+  
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)  // onDelete ở đây nếu user bị xóa, userId trong Book trở thành null
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([authorId])
 }
 
 model Author {
   id        Int      @id @default(autoincrement())
-  name      String
+  name      String  @unique
   books     Book[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
