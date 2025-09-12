@@ -1,40 +1,38 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { NextResponse } from "next/server";
+import { prisma } from "@/app/server/db/client";
 
 // GET /api/authors
+// lấy toàn bộ authors kèm sách
 export async function GET() {
-    const authors = await prisma.author.findMany();
-    return NextResponse.json(authors);
+  try {
+    const authors = await prisma.author.findMany({
+      include: { books: true },
+    });
+    return NextResponse.json(authors, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch authors" },
+      { status: 500 }
+    );
+  }
 }
 
 // POST /api/authors
 export async function POST(request: Request) {
-    const { name, bio } = await request.json();
-    const newAuthor = await prisma.author.create({
-        data: {
-            name,
-            bio,
-        },
-    });
-    return NextResponse.json(newAuthor, { status: 201 });
-}
-
-// PUT /api/authors/:id
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-    const { id } = params;
-    const { name, bio } = await request.json();
-    const updatedAuthor = await prisma.author.update({
-        where: { id },
-        data: { name, bio },
-    });
-    return NextResponse.json(updatedAuthor);
-}
-
-// DELETE /api/authors/:id
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-    const { id } = params;
-    await prisma.author.delete({
-        where: { id },
-    });
-    return NextResponse.json({ message: 'Author deleted' });
+    try {
+        const body = await request.json();
+        const { name } = body;
+        if (!name) {
+            return NextResponse.json(
+                { error: "Author name is required" },
+                { status: 400 }
+            );
+        }
+        const newAuthor = await prisma.author.create({
+            data: { name },
+        });
+        return NextResponse.json(newAuthor, { status: 201 });
+    } catch (error) {
+        return NextResponse.json({ error: "Failed to create author" }, { status: 500 });
+    }
 }
